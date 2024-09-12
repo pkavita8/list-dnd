@@ -76,8 +76,8 @@ function App() {
         <h1 className="text-4xl p-2">List DND</h1>
         {lastSavedTime && (
           <p>
-            Last Saved at{" "}
-            {moment(lastSavedTime).format("MMMM Do YYYY, h:mm:ss a")}
+            Last Saved {" "}
+            {moment(lastSavedTime).fromNow()}
           </p>
         )}
         <DndProvider backend={HTML5Backend}>

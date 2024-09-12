@@ -1,5 +1,5 @@
 {
-  "name": "list-dnd",
+  "name": "list-reorder",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
