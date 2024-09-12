@@ -17,8 +17,9 @@ export const handlers = [
 
   http.post(API_URL, async ({ request }) => {
     const newOrder = await request.json()
-    console.log('newOrder: ', newOrder);
+
     saveOrder(newOrder);
+
     return HttpResponse.json({
       status: 201,
       message: "Cards order saved successfully",
