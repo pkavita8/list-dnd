@@ -23,7 +23,7 @@ function App() {
       const response = await fetch(API_URL);
       const savedPositions = await response.json();
 
-      if (savedPositions) {
+      if (savedPositions?.length) {
         const reorderedCards = savedPositions.map((position: number) =>
           initialData.find((card) => card.position === position)
         );
