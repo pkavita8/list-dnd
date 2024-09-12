@@ -6,39 +6,52 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import Card, { CardType } from "./components/Card";
 import ImageModal from "./components/ImageModal";
 import moment from "moment";
+import { API_URL } from "./constants";
 
 const initialData: CardType[] = data;
 
 function App() {
-
   const [cards, setCards] = useState<CardType[]>(initialData);
-  
+
   const [lastSavedTime, setLastSavedTime] = useState("");
   const lastSavedOrder = useRef<number[]>([]);
 
   const [imageURL, setImageURL] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedOrder = localStorage.getItem("order");
-    if (savedOrder) {
-      const savedPositions = JSON.parse(savedOrder);
-      const reorderedCards = savedPositions.map((position: number) =>
-        initialData.find((card) => card.position === position)
-      );
-      setCards(reorderedCards);
-      lastSavedOrder.current = savedPositions;
-    }
+    const fetchOrder = async () => {
+      const response = await fetch(API_URL);
+      const savedPositions = await response.json();
+
+      if (savedPositions) {
+        const reorderedCards = savedPositions.map((position: number) =>
+          initialData.find((card) => card.position === position)
+        );
+        setCards(reorderedCards);
+        lastSavedOrder.current = savedPositions;
+      }
+    };
+
+    fetchOrder();
   }, []);
 
-  const saveOrder = useCallback(() => {
+  const saveOrder = useCallback(async () => {
     const currentPositions = cards.map((card) => card.position);
+
     if (
       JSON.stringify(lastSavedOrder.current) !==
       JSON.stringify(currentPositions)
     ) {
-      localStorage.setItem("order", JSON.stringify(currentPositions));
-      lastSavedOrder.current = currentPositions;
-      setLastSavedTime(new Date().toISOString());
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(currentPositions),
+      });
+
+      if (response.ok) {
+        lastSavedOrder.current = currentPositions;
+        setLastSavedTime(new Date().toISOString());
+      }
     }
   }, [cards]);
 
@@ -62,7 +75,10 @@ function App() {
       <header className="App-header">
         <h1 className="text-4xl p-2">List DND</h1>
         {lastSavedTime && (
-          <p>Last Saved at {moment(lastSavedTime).format('MMMM Do YYYY, h:mm:ss a')}</p>
+          <p>
+            Last Saved at{" "}
+            {moment(lastSavedTime).format("MMMM Do YYYY, h:mm:ss a")}
+          </p>
         )}
         <DndProvider backend={HTML5Backend}>
           <div className="grid grid-cols-3 gap-5 p-4">
