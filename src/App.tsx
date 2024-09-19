@@ -138,8 +138,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1 className="text-4xl p-2">List DND</h1>
-        {lastSavedTime && <p>Last Saved {moment(lastSavedTime).fromNow()}</p>}
+        <h1 className="text-4xl p-2">Task Management</h1>
+        {/* {lastSavedTime && <p>Last Saved {moment(lastSavedTime).fromNow()}</p>} */}
         <div>
           <button onClick={() => setAddNewTask(true)}>Add Task</button>
           <div className="gap-2">
@@ -152,7 +152,10 @@ function App() {
               placeholder="search by category"
               onChange={(event) => setSearchText(event.target.value)}
             ></input>
-            <button className="mr-2" onClick={() => setSearchCategory(searchText)}>
+            <button
+              className="mr-2"
+              onClick={() => setSearchCategory(searchText)}
+            >
               Search
             </button>
             <button
@@ -165,22 +168,29 @@ function App() {
             </button>
           </div>
         </div>
-        <div className="flex-col gap-5 p-4">
-          {filteredTasks.map(({ id, title, description, category, status }) => (
-            <div className="flex border p-6 m-2 w-full justify-between">
-              <div>
-                <p>{title}</p>
-                <p>{description}</p>
-                <p>{category}</p>
-                <p>{status}</p>
-              </div>
-              <div className="flex gap-4">
-                <button onClick={() => onMarkDone(id)}>Mark As Done</button>
-                <button onClick={() => onDelete(id)}>Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
+
+        {filteredTasks.length === 0 ? (
+          <p>No results found..</p>
+        ) : (
+          <div className="flex-col gap-5 p-4">
+            {filteredTasks?.map(
+              ({ id, title, description, category, status }) => (
+                <div className="flex border p-6 m-2 w-full justify-between">
+                  <div>
+                    <p>{title}</p>
+                    <p>{description}</p>
+                    <p>{category}</p>
+                    <p>{status}</p>
+                  </div>
+                  <div className="flex gap-4">
+                    <button onClick={() => onMarkDone(id)}>Mark As Done</button>
+                    <button onClick={() => onDelete(id)}>Delete</button>
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        )}
 
         {addNewTask && (
           <AddTaskModal
