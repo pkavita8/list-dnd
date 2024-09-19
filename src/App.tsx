@@ -7,8 +7,19 @@ import Card, { CardType } from "./components/Card";
 import ImageModal from "./components/ImageModal";
 import moment from "moment";
 import { API_URL } from "./constants";
-
+import mocktasks from "./mockData.json";
+import AddTaskModal from "./components/AddTaskModal";
 const initialData: CardType[] = data;
+
+export interface TaskType {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  status: string;
+}
+
+const initialTaskData: TaskType[] = mocktasks;
 
 function App() {
   const [cards, setCards] = useState<CardType[]>(initialData);
@@ -18,6 +29,8 @@ function App() {
 
   const [imageURL, setImageURL] = useState<string | null>(null);
 
+  const [addNewTask, setAddNewTask] = useState(false);
+  const [tasks, setTasks] = useState<TaskType[]>(initialTaskData);
   useEffect(() => {
     const fetchOrder = async () => {
       const response = await fetch(API_URL);
@@ -70,17 +83,69 @@ function App() {
     setCards(updatedCards);
   };
 
+  const onAddNewTask = (
+    title: string,
+    category: string,
+    description: string
+  ) => {
+    setTasks((prev) => {
+      const oldtasks = [...prev];
+      oldtasks.push({
+        id: oldtasks.length + 1,
+        title,
+        category,
+        description,
+        status: "pending",
+      });
+      return oldtasks;
+    });
+  };
+
+  const onMarkDone = (id: number) => {
+    setTasks((prev) => {
+      return prev.map((task) =>
+        task.id === id ? { ...task, status: "completed" } : task
+      );
+    });
+  };
+
+  const onDelete = (id: number) => {
+    setTasks((prev) => {
+      const oldtasks = [...prev];
+      return oldtasks.filter((task) => task.id !== id);
+    });
+  };
+
   return (
     <div className="App">
       <header className="App-header">
         <h1 className="text-4xl p-2">List DND</h1>
-        {lastSavedTime && (
-          <p>
-            Last Saved {" "}
-            {moment(lastSavedTime).fromNow()}
-          </p>
+        {lastSavedTime && <p>Last Saved {moment(lastSavedTime).fromNow()}</p>}
+        <button onClick={() => setAddNewTask(true)}>Add Task</button>
+        <div className="flex-col gap-5 p-4">
+          {tasks.map(({ id, title, description, category, status }) => (
+            <div className="flex border p-6 m-2 w-full justify-between">
+              <div>
+                <p>{title}</p>
+                <p>{description}</p>
+                <p>{category}</p>
+                <p>{status}</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => onMarkDone(id)}>Done</button>
+                <button onClick={() => onDelete(id)}>Delete</button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {addNewTask && (
+          <AddTaskModal
+            onClickSave={onAddNewTask}
+            close={() => setAddNewTask(false)}
+          />
         )}
-        <DndProvider backend={HTML5Backend}>
+        {/* <DndProvider backend={HTML5Backend}>
           <div className="grid grid-cols-3 gap-5 p-4">
             {cards.map((element, index) => (
               <Card
@@ -93,7 +158,7 @@ function App() {
               />
             ))}
           </div>
-        </DndProvider>
+        </DndProvider> */}
 
         {imageURL && (
           <ImageModal url={imageURL} close={() => setImageURL(null)} />
