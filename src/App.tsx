@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "./App.css";
 import data from "./data.json";
 import { DndProvider } from "react-dnd";
@@ -30,7 +36,12 @@ function App() {
   const [imageURL, setImageURL] = useState<string | null>(null);
 
   const [addNewTask, setAddNewTask] = useState(false);
+
   const [tasks, setTasks] = useState<TaskType[]>(initialTaskData);
+
+  const [searchText, setSearchText] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
+
   useEffect(() => {
     const fetchOrder = async () => {
       const response = await fetch(API_URL);
@@ -83,6 +94,14 @@ function App() {
     setCards(updatedCards);
   };
 
+  const filteredTasks = useMemo(() => {
+    if (!searchCategory) return tasks;
+
+    return tasks.filter(
+      (task) => task.category.toLowerCase() === searchCategory.toLowerCase()
+    );
+  }, [searchCategory, tasks]);
+
   const onAddNewTask = (
     title: string,
     category: string,
@@ -121,9 +140,33 @@ function App() {
       <header className="App-header">
         <h1 className="text-4xl p-2">List DND</h1>
         {lastSavedTime && <p>Last Saved {moment(lastSavedTime).fromNow()}</p>}
-        <button onClick={() => setAddNewTask(true)}>Add Task</button>
+        <div>
+          <button onClick={() => setAddNewTask(true)}>Add Task</button>
+          <div className="gap-2">
+            <label>Search : </label>
+            <input
+              className="text-white bg-transparent ml-4 border-white"
+              type="text"
+              name="title"
+              value={searchText}
+              placeholder="search by category"
+              onChange={(event) => setSearchText(event.target.value)}
+            ></input>
+            <button className="mr-2" onClick={() => setSearchCategory(searchText)}>
+              Search
+            </button>
+            <button
+              onClick={() => {
+                setSearchText("");
+                setSearchCategory("");
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
         <div className="flex-col gap-5 p-4">
-          {tasks.map(({ id, title, description, category, status }) => (
+          {filteredTasks.map(({ id, title, description, category, status }) => (
             <div className="flex border p-6 m-2 w-full justify-between">
               <div>
                 <p>{title}</p>
@@ -131,8 +174,8 @@ function App() {
                 <p>{category}</p>
                 <p>{status}</p>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => onMarkDone(id)}>Done</button>
+              <div className="flex gap-4">
+                <button onClick={() => onMarkDone(id)}>Mark As Done</button>
                 <button onClick={() => onDelete(id)}>Delete</button>
               </div>
             </div>

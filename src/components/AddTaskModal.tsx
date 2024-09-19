@@ -2,10 +2,10 @@ import { useState } from "react";
 
 const AddTaskModal = ({
   onClickSave,
-  close
+  close,
 }: {
   onClickSave: (title: string, category: string, description: string) => void;
-  close: VoidFunction
+  close: VoidFunction;
 }) => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -13,11 +13,11 @@ const AddTaskModal = ({
 
   const onSubmit = () => {
     onClickSave(title, category, description);
-    close()
+    close();
   };
   return (
     <div className="fixed w-full h-full flex items-center justify-center bg-black top-0">
-         <button
+      <button
         onClick={() => close()}
         className="text-xxl w-10 h-10 rounded-md absolute right-2 top-2 bg-white text-black"
       >
@@ -30,10 +30,11 @@ const AddTaskModal = ({
         <div>
           <label>Title : </label>
           <input
-          className="text-white bg-transparent ml-4 border-white"
-          type="text"
+            className="text-white bg-transparent ml-4 border-white"
+            type="text"
             name="title"
             value={title}
+            placeholder="Enter Title"
             onChange={(event) => setTitle(event.target.value)}
           ></input>
         </div>
@@ -45,6 +46,7 @@ const AddTaskModal = ({
             name="description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
+            placeholder="Enter Description"
           />
         </div>
         <div className="mb-1">
@@ -54,6 +56,7 @@ const AddTaskModal = ({
             type="text"
             name="category"
             value={category}
+            placeholder="Enter Category"
             onChange={(event) => setCategory(event.target.value)}
           />
         </div>
